@@ -1,8 +1,7 @@
-//var redis = require('redis'),
-//    client = redis.createClient();
+var Q = require('q');
 
 module.exports = function(RED) {
-    "use strict";
+    "use strict";    
 
     function SenseEvent(n) {
         RED.nodes.createNode(this,n);
@@ -71,4 +70,60 @@ module.exports = function(RED) {
         });
     }
     RED.nodes.registerType("sense command", SenseCommand);
+
+    function SenseCommandSync(n) {
+        RED.nodes.createNode(this,n);
+        var senseId = n.senseid,
+            commandType = n.commandtype,
+            commandName = n.commandname,
+            node = this;
+
+
+        function guid() {
+            function s4() {
+                return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+             }
+            return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+                 s4() + '-' + s4() + s4() + s4();
+        }
+
+        node.on('input', function(msg) {
+            if (!msg.payload) {
+                node.error('Missing property: msg.payload');
+                return;
+            }
+
+            var id = guid();
+            var syncCommandCache = RED.comms.syncCommandCache;
+
+            var deferred = syncCommandCache[id] = Q.defer();            
+            
+            // TODO : Add timeout for sync commands
+            var p = deferred.promise.then(function(result) {
+
+                node.send({
+                    payload: result
+                });   
+
+            });
+            
+            var message = {
+                header: {
+                    type: 'modules'
+                },
+                payload: {
+                    syncCmdId : id,
+                    commandType: commandType,
+                    commandName: commandName,
+                    commandData: msg.payload
+                }
+            };
+            RED.comms.publish_sense(senseId, message, true);
+
+        });
+    }
+    RED.nodes.registerType("sense command sync", SenseCommandSync); 
+
 };

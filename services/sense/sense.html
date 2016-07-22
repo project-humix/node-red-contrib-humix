@@ -38,6 +38,25 @@
     </div>
 </script>
 
+<script class="sense" type="text/x-red" data-template-name="sense command sync">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-senseid"><i class="fa fa-tag"></i> Sense ID</label>
+        <select id="node-input-senseid" onclick="getCommandTypes(this.value)" placeholder="Sense ID"></select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-commandtype"><i class="fa fa-tag"></i> Module</label>
+        <select id="node-input-commandtype" onclick="getCommandNames(this.value)" placeholder="Type"></select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-commandname"><i class="fa fa-tag"></i> Command</label>
+        <select id="node-input-commandname" placeholder="Event Name"></select>
+    </div>
+</script>
+
 <script type="text/javascript">
 
     var senseToEventTypeMap = {},               // sense id -> event type map
@@ -209,6 +228,51 @@
         }
     });
 
+    RED.nodes.registerType('sense command sync', {
+        category: 'Humix',
+        color: "rgb(231, 231, 174)",
+        defaults: {
+            name: {value: ""},
+            senseid: {value: "", required: true},
+            commandtype: {value: "", required: true},
+            commandname: {value: "", required: true}
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "white-globe.png",
+        label: function() {
+            return this.name || 'Sync Sense Command';
+        },
+        oneditprepare: function() {
+            $.ajax({
+                method: 'GET',
+                url: '/api/devices',
+                success: function(jsonObj) {
+                    var result = JSON.parse(jsonObj.result);
+
+                    // remove the old options
+                    $("#node-input-senseid").find('option').remove();
+
+                    // update with the new options
+                    for (var i=0; i<result.length; i++) {
+                        var optionElem = '<option value="'+result[i].senseId+'">'+result[i].senseId+'</option>';
+                        $("#node-input-senseid").append(optionElem);
+                        $("#node-input-senseid").val('');
+                    }
+
+                   
+                }
+            });
+
+        },
+        oneditsave: function() {
+            curSenseID = $("#node-input-senseid").val();
+            curCommandType = $("#node-input-commandtype").val();
+            curCommandName = $("#node-input-commandname").val();
+        }
+    });
+
+    
     function getEventTypes(senseid) {
         //console.log('in getEventTypes: '+senseid);
         if (senseid) {
