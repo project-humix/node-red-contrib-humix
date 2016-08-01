@@ -9,7 +9,7 @@
         <select id="node-input-senseid" placeholder="Sense ID"></select>
     </div>
     <div class="form-row">
-        <label for="node-input-eventtype"><i class="fa fa-tag"></i> Type</label>
+        <label for="node-input-eventtype"><i class="fa fa-tag"></i> Module</label>
         <select id="node-input-eventtype" placeholder="Type"></select>
     </div>
     <div class="form-row">
@@ -29,7 +29,7 @@
         <select id="node-input-senseid" placeholder="Sense ID"></select>
     </div>
     <div class="form-row">
-        <label for="node-input-commandtype"><i class="fa fa-tag"></i> Type</label>
+        <label for="node-input-commandtype"><i class="fa fa-tag"></i> Module</label>
         <select id="node-input-commandtype" placeholder="Type"></select>
     </div>
     <div class="form-row">
@@ -244,31 +244,65 @@
             return this.name || 'Sync Sense Command';
         },
         oneditprepare: function() {
-            $.ajax({
-                method: 'GET',
-                url: '/api/devices',
-                success: function(jsonObj) {
-                    var result = JSON.parse(jsonObj.result);
+             var config = nodeIDToConfigMap[this.id]
+            if (config) {
+                console.log(config)
+                curSenseID = config.senseID;
+                curCommandType = config.type;
+                curCommandName = config.name;
 
-                    // remove the old options
-                    $("#node-input-senseid").find('option').remove();
-
-                    // update with the new options
-                    for (var i=0; i<result.length; i++) {
-                        var optionElem = '<option value="'+result[i].senseId+'">'+result[i].senseId+'</option>';
-                        $("#node-input-senseid").append(optionElem);
-                        $("#node-input-senseid").val('');
-                    }
-
-                   
+                for (var i=0; i<curSenseIDList.length; i++) {
+                    var optionElem = '<option value="'+curSenseIDList[i]+'">'+curSenseIDList[i]+'</option>';
+                    $("#node-input-senseid").append(optionElem);
+                    $("#node-input-senseid").val('');
                 }
+                console.log('curSenseID: '+curSenseID);
+                $("#node-input-senseid").val(curSenseID);
+
+            } else {
+              curSenseID = '';
+              curCommandType = '';
+              curCommandName = '';
+              $.ajax({
+                  method: 'GET',
+                  url: '/api/devices',
+                  success: function(jsonObj) {
+                      var result = JSON.parse(jsonObj.result);
+
+                      // remove the old options
+                      $("#node-input-senseid").find('option').remove();
+
+                      // update with the new options
+                      senseToCommandTypeMap = {};
+                      senseCommandTypeToCommandNameMap = {};
+                      curSenseIDList = [result.length];
+                      for (var i=0; i<result.length; i++) {
+                          var optionElem = '<option value="'+result[i].senseId+'">'+result[i].senseId+'</option>';
+                          $("#node-input-senseid").append(optionElem);
+                          $("#node-input-senseid").val('');
+                          curSenseIDList[i] = result[i].senseId;
+                          // cache Command Types & Command Names for each sense id at once
+                          loadSenseToCommandTypeMap(curSenseIDList[i]);
+                      }
+                  }
+              });
+            }
+
+            $("#node-input-senseid").change(function(){
+              if ($("#node-input-senseid").val()) {
+                getCommandTypes(this.value)
+              }
+            });
+
+            $("#node-input-commandtype").change(function(){
+                getCommandNames(this.value)
             });
 
         },
         oneditsave: function() {
-            curSenseID = $("#node-input-senseid").val();
-            curCommandType = $("#node-input-commandtype").val();
-            curCommandName = $("#node-input-commandname").val();
+            nodeIDToConfigMap[this.id] = {senseID: $("#node-input-senseid").val(),
+                                        type: $("#node-input-commandtype").val(),
+                                        name: $("#node-input-commandname").val()};
         }
     });
 
