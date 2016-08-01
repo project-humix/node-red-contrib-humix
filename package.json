@@ -1,36 +1,43 @@
 {
-    "name": "node-red-contrib-humix",
-    "version": "1.0.3",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+  "name": "node-red-contrib-humix",
+  "version": "1.0.4",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/project-humix/node-red-contrib-humix.git"
+  },
+  "keywords": [
+    "node-red",
+    "humix"
+  ],
+  "contributors": [
+    {
+      "name": "Jeffrey Liu",
+      "email": "liuch@tw.ibm.com"
     },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/project-humix/node-red-contrib-humix.git"
+    {
+      "name": "Joey Tseng",
+      "email": "joeyt@tw.ibm.com"
     },
-    "keywords": [
-        "node-red",
-        "humix"
-    ],
-    "contributors": [
-      {"name": "Jeffrey Liu", "email": "liuch@tw.ibm.com"},
-      {"name": "Joey Tseng", "email": "joeyt@tw.ibm.com"},
-      {"name": "Jimmy Liao", "email": "sjliao@tw.ibm.com"}
-
-    ],
-    "license": "Apache v2.0",
-    "node-red": {
-        "nodes": {
-            "humix-facebook-messenger-v1": "services/social/facebook-messenger.js",
-            "humix-facebook-v1": "services/social/facebook.js",
-            "humix-sense-v1": "services/sense/sense.js"
-        }
-    },
-
-    "bugs": {
-        "url": "https://github.com/project-humix/node-red-contrib-humix/issues"
-    },
-    "homepage": "https://github.com/project-humix/node-red-contrib-humix#readme"
+    {
+      "name": "Jimmy Liao",
+      "email": "sjliao@tw.ibm.com"
+    }
+  ],
+  "license": "Apache v2.0",
+  "node-red": {
+    "nodes": {
+      "humix-facebook-messenger-v1": "services/social/facebook-messenger.js",
+      "humix-facebook-v1": "services/social/facebook.js",
+      "humix-sense-v1": "services/sense/sense.js"
+    }
+  },
+  "bugs": {
+    "url": "https://github.com/project-humix/node-red-contrib-humix/issues"
+  },
+  "homepage": "https://github.com/project-humix/node-red-contrib-humix#readme"
 }
